@@ -9,6 +9,7 @@ nav:
   - Model Submission Guide: data/loading_model.md
   - Tutorials: 
     - SBML Dataloader: notebooks/sbml_dataloader.ipynb
+    - KG Dataloader: notebooks/kg_dataloader.ipynb
   - Code Documentation: 
     - System Bio Model: data/sys_bio_model.md
     - Basico Model: data/basico_model.md

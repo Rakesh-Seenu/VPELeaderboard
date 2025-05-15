@@ -9,8 +9,8 @@ import requests
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from dataset import Dataset
-from primekg import PrimeKG
+from .dataset import Dataset
+from .primekg import PrimeKG
 
 class BioBridgePrimeKG(Dataset):
     """
@@ -360,6 +360,206 @@ class BioBridgePrimeKG(Dataset):
                             sep="\t", compression="gzip", index=False)
 
         return df_train, df_node_train, df_test, df_node_test, triplets
+
+    # def _negative_sampling(self,
+    #                        batch_df: pd.DataFrame,
+    #                        process_index: int,
+    #                        index_map: dict,
+    #                        node_train_dict: dict) -> pd.DataFrame:
+    #     """
+    #     A helper function to perform negative sampling for a batch of triplets.
+    #     """
+    #     negative_y_index_list = []
+    #     for _, row in tqdm(batch_df.iterrows(),
+    #                        total=batch_df.shape[0],
+    #                        desc=f"Process {process_index}"):
+    #         x_index = row['head_index']
+    #         # y_index = row['y_index']
+    #         y_index_type = row['tail_type']
+    #         paired_y_index_list = index_map[x_index]
+
+    #         # sample a list of negative y_index
+    #         node_train_sub = node_train_dict[y_index_type]
+    #         negative_y_index = node_train_sub[
+    #             ~node_train_sub['node_index'].isin(paired_y_index_list)
+    #         ]['node_index'].sample(self.n_neg_samples).tolist()
+    #         negative_y_index_list.append(negative_y_index)
+
+    #     batch_df.loc[:, 'negative_tail_index'] = negative_y_index_list
+    #     return batch_df
+
+    # def _build_negative_triplets(self,
+    #                              chunk_size: int=100000,
+    #                              n_neg_samples: int=10):
+    #     """
+    #     Build the negative triplets for BioBridgePrimeKG dataset.
+    #     """
+    #     processed_file_path = os.path.join(self.local_dir,
+    #                                        "processed",
+    #                                        "triplet_train_negative.tsv.gz")
+    #     if os.path.exists(processed_file_path):
+    #         # Load the negative triplets from the local directory
+    #         with open(processed_file_path, "rb") as f:
+    #             triplets_negative = pd.read_csv(f, sep="\t", compression="gzip", low_memory=False)
+    #     else:
+    #         # Set the number samples for negative sampling
+    #         self.n_neg_samples = n_neg_samples
+
+    #         # Split node list by type
+    #         node_train_dict = {}
+    #         type_list = self.df_node_train['node_type'].unique()
+    #         for node_type in type_list:
+    #             node_train_dict[node_type] = self.df_node_train[
+    #                 self.df_node_train['node_type'] == node_type
+    #             ].reset_index(drop=True)
+
+    #         # create an index mapping from x_index to y_index
+    #         index_map = self.df_train[
+    #             ['head_index', 'tail_index']
+    #         ].drop_duplicates().groupby('head_index').agg(list).to_dict()['tail_index']
+
+    #         # Negative sampling
+    #         batch_df_list = []
+    #         for i in tqdm(range(0, self.df_train.shape[0], chunk_size)):
+    #             batch_df_list.append(self.df_train.iloc[i:i+chunk_size])
+    #         # Process negative sampling
+    #         results = [
+    #             self._negative_sampling(batch_df,
+    #                                     num_piece,
+    #                                     index_map,
+    #                                     node_train_dict)
+    #                                     for num_piece, batch_df in enumerate(batch_df_list)
+    #         ]
+
+    #         # Store the negative triplets
+    #         triplets_negative = pd.concat(results, axis=0)
+    #         triplets_negative.to_csv(processed_file_path,
+    #                                  sep="\t", compression="gzip", index=False)
+
+    #     # Set attribute
+    #     self.primekg_triplets_negative = triplets_negative
+
+    #     return triplets_negative
+
+    # def load_data(self,
+    #               build_neg_triplest: bool= False,
+    #               chunk_size: int=100000,
+    #               n_neg_samples: int=10):
+
+    def load_data(self):
+        """
+        Load the BioBridgePrimeKG dataset into pandas DataFrame of nodes and edges.
+
+        Args:
+            build_neg_triplest (bool): Whether to build negative triplets.
+            chunk_size (int): The chunk size for negative sampling.
+            n_neg_samples (int): The number of negative samples for negative sampling.
+        """
+        # Load PrimeKG dataset
+        print("Loading PrimeKG dataset...")
+        self.primekg = self._load_primekg()
+
+        # Load data config file of BioBridgePrimeKG
+        print("Loading data config file of BioBridgePrimeKG...")
+        self.data_config = self._load_data_config()
+
+        # Build node embeddings
+        print("Building node embeddings...")
+        self.emb_dict = self._build_node_embeddings()
+
+        # Build full triplets
+        print("Building full triplets...")
+        self.primekg_triplets, self.node_info_dict = self._build_full_triplets()
+
+        # Build train-test split
+        print("Building train-test split...")
+        self.df_train, self.df_node_train, self.df_test, self.df_node_test, self.primekg_triplets =\
+        self._build_train_test_split()
+
+        # if build_neg_triplest:
+        #     # Build negative triplets
+        #     print("Building negative triplets...")
+        #     self.primekg_triplets_negative = self._build_negative_triplets(
+        #         chunk_size=chunk_size,
+        #         n_neg_samples=n_neg_samples
+        #     )
+
+    def set_random_seed(self, seed: int):
+        """
+        Set the random seed for reproducibility.
+
+        Args:
+            seed (int): The random seed value.
+        """
+        np.random.seed(seed)
+
+    def get_primekg(self) -> PrimeKG:
+        """
+        Get the PrimeKG dataset.
+
+        Returns:
+            The PrimeKG dataset.
+        """
+        return self.primekg
+
+    def get_data_config(self) -> dict:
+        """
+        Get the data config file of BioBridgePrimeKG dataset.
+
+        Returns:
+            The data config file of BioBridgePrimeKG dataset.
+        """
+        return self.data_config
+
+    def get_node_embeddings(self) -> dict:
+        """
+        Get the node embeddings for BioBridgePrimeKG dataset.
+
+        Returns:
+            The dictionary of node embeddings.
+        """
+        return self.emb_dict
+
+    def get_primekg_triplets(self) -> pd.DataFrame:
+        """
+        Get the full triplets for BioBridgePrimeKG dataset.
+
+        Returns:
+            The full triplets for BioBridgePrimeKG dataset.
+        """
+        return self.primekg_triplets
+
+    # def get_primekg_triplets_negative(self) -> pd.DataFrame:
+    #     """
+    #     Get the negative triplets for BioBridgePrimeKG dataset.
+
+    #     Returns:
+    #         The negative triplets for BioBridgePrimeKG dataset.
+    #     """
+    #     return self.primekg_triplets_negative
+
+    def get_train_test_split(self) -> dict:
+        """
+        Get the train-test split for BioBridgePrimeKG dataset.
+
+        Returns:
+            The train-test split for BioBridgePrimeKG dataset.
+        """
+        return {
+            "train": self.df_train,
+            "node_train": self.df_node_train,
+            "test": self.df_test,
+            "node_test": self.df_node_test
+        }
+
+    def get_node_info_dict(self) -> dict:
+        """
+        Get the node information dictionary for BioBridgePrimeKG dataset.
+
+        Returns:
+            The node information dictionary for BioBridgePrimeKG dataset.
+        """
+        return self.node_info_dict
 
     # def _negative_sampling(self,
     #                        batch_df: pd.DataFrame,

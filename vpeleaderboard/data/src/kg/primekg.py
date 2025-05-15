@@ -6,7 +6,7 @@ import os
 import requests
 from tqdm import tqdm
 import pandas as pd
-from dataset import Dataset
+from .dataset import Dataset
 
 class PrimeKG(Dataset):
     """

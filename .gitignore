@@ -10,6 +10,8 @@ __pycache__/
 /docs/algorithms/index.md
 /docs/data/index.md
 /docs/leaderboard/index.md
+/data
+/docs/notebooks/biobridge_cache.pkl
 
 # Distribution / packaging
 .Python
