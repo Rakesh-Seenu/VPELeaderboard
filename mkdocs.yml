@@ -5,15 +5,23 @@ nav:
 - Home: index.md
 - Getting started: user-guide/index.md
 - Data: 
-  - Data Overview: data/index.md
+  - Data Overview: data/overview.md
+  - SBML Dataloader: data/index.md
+  - KG Dataloader: data/index_kg.md
   - Model Submission Guide: data/loading_model.md
   - Tutorials: 
     - SBML Dataloader: notebooks/sbml_dataloader.ipynb
-    - KG Dataloader: notebooks/kg_dataloader.ipynb
+    - KG Dataloader: notebooks/KG_dataloader.ipynb
   - Code Documentation: 
-    - System Bio Model: data/sys_bio_model.md
-    - Basico Model: data/basico_model.md
-    - SBML Dataloader: data/sbml_dataloader.md
+    - SMBL Dataloader: 
+      - System Bio Model: data/sys_bio_model.md
+      - Basico Model: data/basico_model.md
+      - SBML Dataloader: data/sbml_dataloader.md
+    - KG Dataloader:
+      - Biobridge Dataloader: data/kg_dataloader.md
+      - Biobridge Primekg: data/biobridge_primekg.md
+      - Dataset: data/dataset.md
+      - Primekg: data/primekg.md
 - Algorithms: algorithms/index.md
 - Leaderboard: leaderboard/index.md
 - Documentation:
