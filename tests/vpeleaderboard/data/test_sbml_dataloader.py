@@ -1,9 +1,9 @@
 import os
 import pytest
-from vpeleaderboard.data.src.sbml_dataloader import SBMLDataModule
+from vpeleaderboard.data.src.SBML.sbml_dataloader import SBMLDataModule
 import basico
 
-MODEL_PATH = "vpeleaderboard/data/models/BIOMD0000000537_url.xml"
+MODEL_PATH = "vpeleaderboard/data/src/SBML/models/BIOMD0000000537_url.xml"
 
 @pytest.fixture
 def sbml_data_module():

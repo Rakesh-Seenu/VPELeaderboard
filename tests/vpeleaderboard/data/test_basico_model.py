@@ -3,9 +3,9 @@ A test BasicoModel class for pytest unit testing.
 """
 
 import os
-from vpeleaderboard.data.src.basico_model import BasicoModel
+from vpeleaderboard.data.src.SBML.basico_model import BasicoModel
 
-MODEL_PATH = "vpeleaderboard/data/models/BIOMD0000000064_url.xml"
+MODEL_PATH = "vpeleaderboard/data/src/SBML/models/BIOMD0000000064_url.xml"
 
 def test_validate_sbml_folder_path_success():
     """

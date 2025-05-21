@@ -4,15 +4,15 @@ A test class for pytest unit testing.
 
 import os
 import basico
-from vpeleaderboard.data.src.basico_model import BasicoModel
-from vpeleaderboard.data.src.sys_bio_model import SysBioModel
+from vpeleaderboard.data.src.SBML.basico_model import BasicoModel
+from vpeleaderboard.data.src.SBML.sys_bio_model import SysBioModel
 from ...utils.utils import (
     MockModel,
     temp_folder_fixture,
     valid_sbml_folder
 )
 
-MODEL_PATH = "vpeleaderboard/data/models/BIOMD0000000064_url.xml"
+MODEL_PATH = "vpeleaderboard/data/src/SBML/models/BIOMD0000000064_url.xml"
 
 class TestSysBioModel(SysBioModel):
     """Concrete subclass to test abstract SysBioModel"""

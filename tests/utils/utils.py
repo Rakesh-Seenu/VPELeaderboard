@@ -5,8 +5,7 @@ A test markdown class for pytest unit testing.
 import os
 import pytest
 import pandas as pd
-from vpeleaderboard.data.src.basico_model import BasicoModel
-from vpeleaderboard.data.src.sys_bio_model import SysBioModel
+from vpeleaderboard.data.src.SBML.sys_bio_model import SysBioModel
 
 @pytest.fixture(name="temp_folder")
 def temp_folder_fixture():
