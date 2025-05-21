@@ -1,8 +1,4 @@
 # vpeleaderboard/app/source/data/code/__init__.py
 """
-Code module containing SBML processing scripts.
+init file for the src package.
 """
-from . import sbml
-from . import kg
-
-__all__ = ["sbml", "kg"]
