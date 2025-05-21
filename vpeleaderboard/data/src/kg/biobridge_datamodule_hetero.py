@@ -20,12 +20,12 @@ class BioBridgeDataModule(LightningDataModule):
     `LightningDataModule` for the BioBridge dataset.
     """
     def __init__(self,
-                 primekg_dir: str = "../../../../data/primekg/",
-                 biobridge_dir: str = "../../../../data/biobridge_primekg/",
+                 primekg_dir: str = "../../../data/primekg/",
+                 biobridge_dir: str = "../../../data/biobridge_primekg/",
                  batch_size: int = 64,
                  cache_path: str = "./biobridge_cache.pkl") -> None:
         """
-        Initializes the BioBridgeDataModule.
+        Initializes the BioBridgeDatadm.
 
         Args:
             primekg_dir (str): Directory where the PrimeKG dataset is stored.
@@ -42,8 +42,9 @@ class BioBridgeDataModule(LightningDataModule):
         self.batch_size = batch_size
         self.cache_path = cache_path
         self.biobridge = None
-        self.mapper = {}
         self.data = {}
+        self.data = {}
+        
 
     def prepare_data(self) -> None:
         """
@@ -56,12 +57,11 @@ class BioBridgeDataModule(LightningDataModule):
             return
 
         # Load BioBridge and PrimeKG data
-        self.biobridge = BioBridgePrimeKG(primekg_dir=self.primekg_dir,
-                                          local_dir=self.biobridge_dir)
+        self.biobridge = BioBridgePrimeKG(local_dir=self.biobridge_dir)
         self.biobridge.load_data()
 
-        self.mapper['nt2ntid'] = self.biobridge.get_data_config()["node_type"]
-        self.mapper['ntid2nt'] = {v: k for k, v in self.mapper['nt2ntid'].items()}
+        self.data['nt2ntid'] = self.biobridge.get_data_config()["node_type"]
+        self.data['ntid2nt'] = {v: k for k, v in self.data['nt2ntid'].items()}
 
         node_index_list = []
         for node_type in self.biobridge.preselected_node_types:
@@ -69,6 +69,7 @@ class BioBridgeDataModule(LightningDataModule):
                                                "processed", f"{node_type}.csv"))
             node_index_list.extend(df_node["node_index"].tolist())
 
+        # self.primekg = PrimeKG(local_dir=self.primekg_dir)
         triplets = self.biobridge.primekg.get_edges().copy()
         triplets = triplets[
             triplets["head_index"].isin(node_index_list) &

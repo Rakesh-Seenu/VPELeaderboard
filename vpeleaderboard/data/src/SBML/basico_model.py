@@ -8,7 +8,7 @@ import logging
 from typing import Optional, Dict, Union,Any
 import basico
 from pydantic import Field
-from ..src.sys_bio_model import SysBioModel
+from ...src.SBML.sys_bio_model import SysBioModel
 
 # Initialize logger
 logging.basicConfig(level=logging.INFO)
