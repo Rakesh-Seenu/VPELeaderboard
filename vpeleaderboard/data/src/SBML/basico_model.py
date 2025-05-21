@@ -2,7 +2,6 @@
 BasicoModel class for loading SBML models
 using the basico package.
 """
-
 import os
 import logging
 from typing import Optional, Dict, Union,Any
