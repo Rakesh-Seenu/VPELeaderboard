@@ -87,7 +87,7 @@ class SBMLDataModule(LightningDataModule):
                 f"Expected at: {sbml_path}"
             )
         self.sbml_file_path = sbml_path
-        yaml_file = os.path.join(script_dir, "../configs/data", f"{self.fine_name}.yaml")
+        yaml_file = os.path.join(script_dir, "../../configs/data", f"{self.fine_name}.yaml")
         if not os.path.exists(yaml_file):
             raise FileNotFoundError(f"YAML file not found: {yaml_file}")
 
