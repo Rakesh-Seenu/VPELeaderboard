@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ main ]
     paths:
-      - 'vpeleaderboard/data/src/SBML/models/**'
+      - 'vpeleaderboard/data/src/sbml/models/**'
       - 'vpeleaderboard/configs/data**'
   workflow_dispatch:
 
@@ -30,7 +30,7 @@ jobs:
         id: validate
         run: |
           echo "🔍 Validating XML and YAML files on ${{ matrix.os }}..."
-          models=$(ls vpeleaderboard/data/src/SBML/models/*.xml 2>/dev/null | xargs -n 1 basename | sed 's/.xml$//')
+          models=$(ls vpeleaderboard/data/src/sbml/models/*.xml 2>/dev/null | xargs -n 1 basename | sed 's/.xml$//')
           configs=$(ls vpeleaderboard/configs/data/*.yaml 2>/dev/null | xargs -n 1 basename | sed 's/.yaml$//')
 
           missing=false
@@ -69,7 +69,7 @@ jobs:
         shell: pwsh
         run: |
           echo "🔍 Validating XML and YAML files on Windows..."
-          $models = Get-ChildItem "vpeleaderboard\data\src\SBML\models\*.xml" | ForEach-Object { $_.BaseName }
+          $models = Get-ChildItem "vpeleaderboard\data\src\sbml\models\*.xml" | ForEach-Object { $_.BaseName }
           $configs = Get-ChildItem "vpeleaderboard\configs\data\*.yaml" | ForEach-Object { $_.BaseName }
 
           $missing = $false
