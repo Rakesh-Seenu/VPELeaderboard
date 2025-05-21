@@ -26,6 +26,13 @@ jobs:
         with:
           python-version: 3.12
 
+      - name: Debug directory contents
+        run: |
+          echo "📂 Listing model XML files:"
+          ls -l vpeleaderboard/data/src/sbml/models/ || echo "No models found"
+          echo "📂 Listing config YAML files:"
+          ls -l vpeleaderboard/configs/data/ || echo "No configs found"    
+
       - name: Validate XML/YAML file presence and naming
         id: validate
         run: |
