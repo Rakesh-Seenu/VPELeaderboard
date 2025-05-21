@@ -38,8 +38,8 @@ jobs:
         run: |
           echo "🔍 Validating XML and YAML files on ${{ matrix.os }}..."
           models=$(ls vpeleaderboard/data/src/sbml/models/*.xml 2>/dev/null | xargs -n 1 basename | sed 's/.xml$//')
-          configs=$(ls vpeleaderboard/configs/data/*.yaml 2>/dev/null | xargs -n 1 basename | sed 's/.yaml$//')
-          
+          configs=$(ls vpeleaderboard/configs/data/*.yaml 2>/dev/null | xargs -n 1 basename | sed 's/.yaml$//')
+
           missing=false
           for model in $models; do
             if ! echo "$configs" | grep -q "^$model$"; then
