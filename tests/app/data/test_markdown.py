@@ -6,14 +6,14 @@ import os
 from vpeleaderboard.data.src.sbml.basico_model import BasicoModel
 from app.data.markdown_report import generate_markdown_report
 
-MODEL_PATH = "vpeleaderboard/data/src/SBML/models/BIOMD0000000064_url.xml"
+MODEL_PATH = "vpeleaderboard/data/src/sbml/models/BIOMD0000000064_url.xml"
 
 def test_validate_sbml_file_path_success():
     """
     Test SBML directory validation when XML files exist.
     """
-    assert os.path.exists("vpeleaderboard/data/src/SBML/models")
-    assert len([f for f in os.listdir("vpeleaderboard/data/src/SBML/models") if f.endswith(".xml")]) > 0
+    assert os.path.exists("vpeleaderboard/data/src/sbml/models")
+    assert len([f for f in os.listdir("vpeleaderboard/data/src/sbml/models") if f.endswith(".xml")]) > 0
     sbml_file_path = os.path.abspath(MODEL_PATH)
 
     model = BasicoModel(sbml_file_path=sbml_file_path)
@@ -34,7 +34,7 @@ def test_generate_markdown_report():
     """
     Test the generate_markdown_report function.
     """
-    folder_path = "vpeleaderboard/data/src/SBML/models"
+    folder_path = "vpeleaderboard/data/src/sbml/models"
     # folder_path = os.path.abspath(folder_path)
     output_path = "tests/test_index.md"
 
