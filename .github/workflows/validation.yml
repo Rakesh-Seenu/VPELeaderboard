@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ main ]
     paths:
-      - 'vpeleaderboard/data/src/sbml/models**'
+      - 'vpeleaderboard/data/src/sbml/models/**'
       - 'vpeleaderboard/configs/data**'
   workflow_dispatch:
 
@@ -31,28 +31,14 @@ jobs:
           echo "📂 Listing model XML files:"
           ls -l vpeleaderboard/data/src/sbml/models/ || echo "No models found"
           echo "📂 Listing config YAML files:"
-          ls -l vpeleaderboard/configs/data/ || echo "No configs found"    
+          ls -l vpeleaderboard/configs/data/ || echo "No configs found"  
 
       - name: Validate XML/YAML file presence and naming
         id: validate
         run: |
           echo "🔍 Validating XML and YAML files on ${{ matrix.os }}..."
-
-          models_files=$(ls vpeleaderboard/data/src/sbml/models/ -iname '*.xml' 2>/dev/null || true)
-          configs_files=$(ls vpeleaderboard/configs/data/*.yaml 2>/dev/null || true)
-
-          models=""
-          if [ -n "$models_files" ]; then
-            models=$(echo "$models_files" | xargs -n 1 basename | sed 's/.xml$//')
-          fi
-
-          configs=""
-          if [ -n "$configs_files" ]; then
-            configs=$(echo "$configs_files" | xargs -n 1 basename | sed 's/.yaml$//')
-          fi
-
-          echo "📦 Models found: $models"
-          echo "📦 Configs found: $configs"
+          models=$(ls vpeleaderboard/data/src/sbml/models/*.xml 2>/dev/null | xargs -n 1 basename | sed 's/.xml$//')
+          configs=$(ls vpeleaderboard/configs/data/*.yaml 2>/dev/null | xargs -n 1 basename | sed 's/.yaml$//')
 
           missing=false
           for model in $models; do
