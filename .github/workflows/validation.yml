@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "🔍 Validating XML and YAML files on ${{ matrix.os }}..."
 
-          models_files=$(ls vpeleaderboard/data/src/sbml/models/*.xml 2>/dev/null || true)
+          models_files=$(ls vpeleaderboard/data/src/sbml/models/ -iname '*.xml' 2>/dev/null || true)
           configs_files=$(ls vpeleaderboard/configs/data/*.yaml 2>/dev/null || true)
 
           models=""
