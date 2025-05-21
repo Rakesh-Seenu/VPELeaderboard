@@ -53,6 +53,7 @@ jobs:
               echo "❌ Missing XML for config: $config"
               missing=true
             fi
+          done  
 
           if [ "$missing" = true ]; then
             echo "⛔ Validation failed. Ensure matching XML and YAML files exist."
