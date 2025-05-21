@@ -3,7 +3,7 @@ A test markdown class for pytest unit testing.
 """
 
 import os
-from vpeleaderboard.data.src.SBML.basico_model import BasicoModel
+from vpeleaderboard.data.src.sbml.basico_model import BasicoModel
 from app.data.markdown_report import generate_markdown_report
 
 MODEL_PATH = "vpeleaderboard/data/src/SBML/models/BIOMD0000000064_url.xml"

@@ -42,27 +42,19 @@ class BioBridgeDataModule(LightningDataModule):
         self.batch_size = batch_size
         self.cache_path = cache_path
         self.biobridge = None
+        self.mapper = {}
         self.data = {}
         self.data = {}
-        
 
-    def prepare_data(self) -> None:
-        """
-        Prepare the data by downloading and processing it, or loading from cache if available.
-        """
-        if os.path.exists(self.cache_path):
-            print(f"🔁 Loading cached data from {self.cache_path}")
-            with open(self.cache_path, "rb") as f:
-                self.data = pickle.load(f)
-            return
-
-        # Load BioBridge and PrimeKG data
+    def _load_biobridge_data(self) -> None:
+            # Load BioBridge and PrimeKG data
         self.biobridge = BioBridgePrimeKG(local_dir=self.biobridge_dir)
         self.biobridge.load_data()
 
         self.data['nt2ntid'] = self.biobridge.get_data_config()["node_type"]
         self.data['ntid2nt'] = {v: k for k, v in self.data['nt2ntid'].items()}
 
+    def _filter_triplets(self):
         node_index_list = []
         for node_type in self.biobridge.preselected_node_types:
             df_node = pd.read_csv(os.path.join(self.biobridge.local_dir,
@@ -80,7 +72,21 @@ class BioBridgeDataModule(LightningDataModule):
             triplets["head_index"].isin(self.biobridge.emb_dict) &
             triplets["tail_index"].isin(self.biobridge.emb_dict)
         ].reset_index(drop=True)
+        return triplets
 
+    def prepare_data(self) -> None:
+        """
+        Prepare the data by downloading and processing it, 
+        or loading from cache if available.
+        """
+        if os.path.exists(self.cache_path):
+            print(f"🔁 Loading cached data from {self.cache_path}")
+            with open(self.cache_path, "rb") as f:
+                self.data = pickle.load(f)
+            return
+        self._load_biobridge_data()
+
+        triplets = self._filter_triplets()
         nodes = self.biobridge.primekg.get_nodes().copy()
         nodes = nodes[nodes["node_index"].isin(
             np.unique(np.concatenate([triplets.head_index.unique(),
@@ -92,13 +98,17 @@ class BioBridgeDataModule(LightningDataModule):
 
         for nt in node_types:
             self.mapper[nt] = {}
-            self.mapper[nt]['to_nidx'] = nodes[nodes['node_type'] == nt]["node_index"].reset_index(drop=True).to_dict()
+            self.mapper[nt]['to_nidx'] = nodes[nodes['node_type'] == nt]["node_index"]
+            self.mapper[nt]['to_nidx']= self.mapper[nt]['to_nidx'].reset_index(drop=True).to_dict()
             self.mapper[nt]['from_nidx'] = {v: k for k, v in self.mapper[nt]['to_nidx'].items()}
             self.data["init"][nt].num_nodes = len(self.mapper[nt]['from_nidx'])
-            emb_ = np.array([self.biobridge.emb_dict[i] for i in list(self.mapper[nt]['from_nidx'].keys())])
+            keys = list(self.mapper[nt]['from_nidx'].keys())
+            emb_ = np.array([self.biobridge.emb_dict[i] for i in keys])
             self.data["init"][nt].x = torch.tensor(emb_, dtype=torch.float32)
 
-        for ht, rt, tt in triplets[["head_type", "display_relation", "tail_type"]].drop_duplicates().values:
+        for ht, rt, tt in triplets[["head_type",
+                                    "display_relation",
+                                    "tail_type"]].drop_duplicates().values:
             t_ = triplets[
                 (triplets['head_type'] == ht) &
                 (triplets['display_relation'] == rt) &
@@ -106,7 +116,8 @@ class BioBridgeDataModule(LightningDataModule):
             ]
             src_ids = t_['head_index'].map(self.mapper[ht]['from_nidx']).values
             dst_ids = t_['tail_index'].map(self.mapper[tt]['from_nidx']).values
-            self.data["init"][(ht, rt, tt)].edge_index = torch.tensor([src_ids, dst_ids], dtype=torch.long)
+            self.data["init"][(ht, rt, tt)].edge_index = torch.tensor([src_ids, dst_ids],
+                                                                      dtype=torch.long)
 
 
         # Cache the initial processed HeteroData to disk
@@ -135,7 +146,6 @@ class BioBridgeDataModule(LightningDataModule):
         with open(self.cache_path, "wb") as f:
             pickle.dump(self.data, f)
         print(f"✅ Cached train/val/test splits to {self.cache_path}")
-        
     def train_dataloader(self) -> DataLoader:
         if "train" not in self.data:
             raise RuntimeError("Please run `setup()` before calling train_dataloader().")

@@ -10,7 +10,7 @@ import os
 import logging
 import pandas as pd
 import hydra
-from vpeleaderboard.data.src.basico_model import BasicoModel
+from vpeleaderboard.data.src.sbml.basico_model import BasicoModel
 from ..utils import create_markdown, save_markdown
 
 logging.basicConfig(level=logging.INFO)

@@ -5,11 +5,11 @@ Class for loading BioBridgePrimeKG dataset and  PrimeKG nodes and edges data set
 import os
 import pickle
 import json
+from abc import ABC, abstractmethod
 import requests
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from abc import ABC, abstractmethod
 
 class Dataset(ABC):
     """

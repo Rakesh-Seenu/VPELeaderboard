@@ -2,7 +2,7 @@
 """
 Code module containing SBML processing scripts.
 """
-from . import SBML
-from . import KG
+from . import sbml
+from . import kg
 
-__all__ = ["SBML", "KG"]
+__all__ = ["sbml", "kg"]
