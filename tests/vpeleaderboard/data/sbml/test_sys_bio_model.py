@@ -6,7 +6,7 @@ import os
 import basico
 from vpeleaderboard.data.src.sbml.basico_model import BasicoModel
 from vpeleaderboard.data.src.sbml.sys_bio_model import SysBioModel
-from ....utils.utils import (
+from vpeleaderboard.data.utils.utils import (
     MockModel,
     temp_folder_fixture,
     valid_sbml_folder
