@@ -60,7 +60,8 @@ class BioBridgeDataModule(LightningDataModule):
         self.data = {}
 
     def _load_biobridge_data(self) -> None:
-        self.biobridge = BioBridgePrimeKG(local_dir=self.biobridge_dir)
+        self.biobridge = BioBridgePrimeKG(local_dir=self.biobridge_dir,
+                                         primekg_dir=self.primekg_dir)
         self.biobridge.load_data()
 
         self.data['nt2ntid'] = self.biobridge.get_data_config()["node_type"]
