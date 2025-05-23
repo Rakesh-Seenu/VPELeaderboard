@@ -10,44 +10,56 @@ from pytorch_lightning import LightningDataModule
 import numpy as np
 import pandas as pd
 import torch
-from torch_geometric.loader import DataLoader
+import hydra
+from omegaconf import DictConfig
+from torch.utils.data import IterableDataset
+from torch_geometric.loader import DataLoader as GeoDataLoader
 from torch_geometric.data import HeteroData
 from torch_geometric.transforms import RandomLinkSplit
 from .biobridge_primekg import BioBridgePrimeKG
 
+class BioBridgeIterableDataset(IterableDataset):
+    """
+    IterableDataset for iterating over a pandas DataFrame from BioBridge.
+    """
+
+    def __init__(self, data: pd.DataFrame):
+        """
+        Args:
+            data (pd.DataFrame): DataFrame containing the dataset to iterate.
+        """
+        self.data = data
+
+    def __iter__(self):
+        """
+        Iterator that yields each row as a torch tensor.
+
+        Yields:
+            torch.Tensor: Tensor representation of each row.
+        """
+        for _, row in self.data.iterrows():
+            yield torch.tensor(row.values, dtype=torch.float)
+
+    def __getitem__(self, index: int):
+        raise NotImplementedError("Indexing is not supported for this IterableDataset.")
+
+
 class BioBridgeDataModule(LightningDataModule):
     """
-    `LightningDataModule` for the BioBridge dataset.
+    LightningDataModule for the BioBridge dataset.
     """
-    def __init__(self,
-                 primekg_dir: str = "../../../data/primekg/",
-                 biobridge_dir: str = "../../../data/biobridge_primekg/",
-                 batch_size: int = 64,
-                 cache_path: str = "./biobridge_cache.pkl") -> None:
-        """
-        Initializes the BioBridgeDatadm.
-
-        Args:
-            primekg_dir (str): Directory where the PrimeKG dataset is stored.
-            biobridge_dir (str): Directory where the BioBridge dataset is stored.
-            batch_size (int): Batch size for training and evaluation.
-            cache_path (str): Path to cache the processed HeteroData splits.
-        """
+    def __init__(self, cfg: DictConfig) -> None:
         super().__init__()
-
         self.save_hyperparameters(logger=False)
-
-        self.primekg_dir = primekg_dir
-        self.biobridge_dir = biobridge_dir
-        self.batch_size = batch_size
-        self.cache_path = cache_path
+        self.primekg_dir = cfg.data.primekg_dir
+        self.biobridge_dir = cfg.data.biobridge_dir
+        self.batch_size = cfg.data.batch_size
+        self.cache_path = cfg.data.cache_path
         self.biobridge = None
         self.mapper = {}
         self.data = {}
-        self.data = {}
 
     def _load_biobridge_data(self) -> None:
-            # Load BioBridge and PrimeKG data
         self.biobridge = BioBridgePrimeKG(local_dir=self.biobridge_dir)
         self.biobridge.load_data()
 
@@ -61,7 +73,6 @@ class BioBridgeDataModule(LightningDataModule):
                                                "processed", f"{node_type}.csv"))
             node_index_list.extend(df_node["node_index"].tolist())
 
-        # self.primekg = PrimeKG(local_dir=self.primekg_dir)
         triplets = self.biobridge.primekg.get_edges().copy()
         triplets = triplets[
             triplets["head_index"].isin(node_index_list) &
@@ -75,23 +86,20 @@ class BioBridgeDataModule(LightningDataModule):
         return triplets
 
     def prepare_data(self) -> None:
-        """
-        Prepare the data by downloading and processing it, 
-        or loading from cache if available.
-        """
         if os.path.exists(self.cache_path):
             print(f"🔁 Loading cached data from {self.cache_path}")
             with open(self.cache_path, "rb") as f:
                 self.data = pickle.load(f)
             return
-        self._load_biobridge_data()
 
+        self._load_biobridge_data()
         triplets = self._filter_triplets()
+
         nodes = self.biobridge.primekg.get_nodes().copy()
         nodes = nodes[nodes["node_index"].isin(
             np.unique(np.concatenate([triplets.head_index.unique(),
-                                      triplets.tail_index.unique()]))
-        )].reset_index(drop=True)
+                                      triplets.tail_index.unique()])))
+        ].reset_index(drop=True)
 
         node_types = np.unique(nodes['node_type'].tolist())
         self.data["init"] = HeteroData()
@@ -99,7 +107,7 @@ class BioBridgeDataModule(LightningDataModule):
         for nt in node_types:
             self.mapper[nt] = {}
             self.mapper[nt]['to_nidx'] = nodes[nodes['node_type'] == nt]["node_index"]
-            self.mapper[nt]['to_nidx']= self.mapper[nt]['to_nidx'].reset_index(drop=True).to_dict()
+            self.mapper[nt]['to_nidx'] = self.mapper[nt]['to_nidx'].reset_index(drop=True).to_dict()
             self.mapper[nt]['from_nidx'] = {v: k for k, v in self.mapper[nt]['to_nidx'].items()}
             self.data["init"][nt].num_nodes = len(self.mapper[nt]['from_nidx'])
             keys = list(self.mapper[nt]['from_nidx'].keys())
@@ -119,47 +127,61 @@ class BioBridgeDataModule(LightningDataModule):
             self.data["init"][(ht, rt, tt)].edge_index = torch.tensor([src_ids, dst_ids],
                                                                       dtype=torch.long)
 
-
-        # Cache the initial processed HeteroData to disk
         with open(self.cache_path, "wb") as f:
             pickle.dump(self.data, f)
         print(f"✅ Cached processed data to {self.cache_path}")
 
     def setup(self, stage: Optional[str] = None) -> None:
-        """
-        Setup the datasets for training, validation, and testing.
-        """
         if "train" in self.data:
             print("🔁 Reusing previously split train/val/test data")
             return
+        with hydra.initialize(version_base=None, config_path="../../../configs"):
+            cfg: DictConfig = hydra.compose(config_name="config")
 
-        transform = RandomLinkSplit(num_val=0.1,
-                                    num_test=0.2,
-                                    is_undirected=False,
-                                    add_negative_train_samples=True,
-                                    neg_sampling_ratio=1.0,
-                                    split_labels=True,
-                                    edge_types=self.data["init"].edge_types)
+        transform = RandomLinkSplit(
+            num_val=cfg.random_link_split.num_val,
+            num_test=cfg.random_link_split.num_test,
+            is_undirected=cfg.random_link_split.is_undirected,
+            add_negative_train_samples=cfg.random_link_split.add_negative_train_samples,
+            neg_sampling_ratio=cfg.random_link_split.neg_sampling_ratio,
+            split_labels=cfg.random_link_split.split_labels,
+            edge_types=self.data["init"].edge_types,
+        )
 
         self.data["train"], self.data["val"], self.data["test"] = transform(self.data["init"])
 
         with open(self.cache_path, "wb") as f:
             pickle.dump(self.data, f)
         print(f"✅ Cached train/val/test splits to {self.cache_path}")
-    def train_dataloader(self) -> DataLoader:
+
+    def train_dataloader(self) -> GeoDataLoader:
         if "train" not in self.data:
             raise RuntimeError("Please run `setup()` before calling train_dataloader().")
-        return DataLoader([self.data["train"]], batch_size=1, shuffle=False)
+        return GeoDataLoader([self.data["train"]], batch_size=1, shuffle=False)
 
-    def val_dataloader(self) -> DataLoader:
+    def val_dataloader(self) -> GeoDataLoader:
         if "val" not in self.data:
             raise RuntimeError("Please run `setup()` before calling val_dataloader().")
-        return DataLoader([self.data["val"]], batch_size=1, shuffle=False)
+        return GeoDataLoader([self.data["val"]], batch_size=1, shuffle=False)
 
-    def test_dataloader(self) -> DataLoader:
+    def test_dataloader(self) -> GeoDataLoader:
         if "test" not in self.data:
             raise RuntimeError("Please run `setup()` before calling test_dataloader().")
-        return DataLoader([self.data["test"]], batch_size=1, shuffle=False)
+        return GeoDataLoader([self.data["test"]], batch_size=1, shuffle=False)
+
+    def get_iterable_dataset(self, node_type: str) -> BioBridgeIterableDataset:
+        """
+        Get an iterable dataset for a specific node type's CSV file.
+
+        Args:
+            node_type (str): Node type (e.g., 'disease', 'drug').
+
+        Returns:
+            BioBridgeIterableDataset: An iterable dataset over the specified node data.
+        """
+        path = os.path.join(self.biobridge.local_dir, "processed", f"{node_type}.csv")
+        df = pd.read_csv(path)
+        return BioBridgeIterableDataset(df)
 
     def teardown(self, stage: Optional[str] = None) -> None:
         pass

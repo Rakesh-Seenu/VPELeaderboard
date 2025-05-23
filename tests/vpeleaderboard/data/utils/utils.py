@@ -5,13 +5,13 @@ A test markdown class for pytest unit testing.
 import os
 import pytest
 import pandas as pd
-from vpeleaderboard.data.src.SBML.basico_model import BasicoModel
-from vpeleaderboard.data.src.SBML.sys_bio_model import SysBioModel
+from vpeleaderboard.data.src.sbml.basico_model import BasicoModel
+from vpeleaderboard.data.src.sbml.sys_bio_model import SysBioModel
 
 @pytest.fixture
 def model_fixture():
     """Fixture for the BasicoModel class."""
-    return BasicoModel(sbml_file_path="vpeleaderboard/data/models")
+    return BasicoModel(sbml_file_path="vpeleaderboard/data/src/sbml/models")
 
 @pytest.fixture(name="temp_folder")
 def temp_folder_fixture():

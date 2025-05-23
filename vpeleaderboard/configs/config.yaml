@@ -1,5 +1,18 @@
 model_directory: "../src/sbml/models"
 
+random_link_split:
+  num_val: 0.1
+  num_test: 0.2
+  is_undirected: false
+  add_negative_train_samples: true
+  neg_sampling_ratio: 1.0
+  split_labels: true
+
+data:
+  primekg_dir: "../../../data/primekg/"
+  biobridge_dir: "../../../data/biobridge_primekg/"
+  batch_size: 64
+  cache_path: "./biobridge_cache.pkl"
 # defaults:
 #   - _self_
 #   - model: gcn
