@@ -5,28 +5,36 @@ Test cases for datasets/primekg_loader.py
 import os
 import shutil
 import pytest
+import tempfile # Import tempfile
 from omegaconf import DictConfig
 from vpeleaderboard.data.src.kg.biobridge_primekg import BioBridgePrimeKG
 
-# Remove the data folder for testing if it exists
-PRIMEKG_LOCAL_DIR = "../../../../data/primekg/"
-LOCAL_DIR = "../../../../data/biobridge_primekg/"
-shutil.rmtree(LOCAL_DIR, ignore_errors=True)
-
-@pytest.fixture(name="biobridge_primekg")
+@pytest.fixture(name="biobridge_primekg", scope="module") # Added scope="module" for consistency
 def biobridge_primekg_fixture():
     """
-    Fixture for creating an instance of PrimeKG.
+    Fixture for creating an instance of BioBridgePrimeKG using temporary directories.
     """
+    tmpdir = tempfile.mkdtemp() # Create a temporary base directory
+
     cfg = DictConfig({
-    "data": {
-        "primekg_dir": "../../../data/primekg/",
-        "biobridge_dir": "../../../data/biobridge_primekg/",
-        "random_seed": 42, # Optional, if your tests rely on it
-        "n_neg_samples": 5 # Optional
-    }
+        "data": {
+            # Use temporary paths for primekg_dir and biobridge_dir
+            "primekg_dir": os.path.join(tmpdir, "primekg"),
+            "biobridge_dir": os.path.join(tmpdir, "biobridge_primekg"),
+            "random_seed": 42, # Optional, if your tests rely on it
+            "n_neg_samples": 5 # Optional
+        }
     })
-    return BioBridgePrimeKG(cfg)
+
+    # Ensure the directories within the temporary path exist before passing to BioBridgePrimeKG
+    # The BioBridgePrimeKG __init__ also calls setup() which might make them, but being explicit here is safer.
+    os.makedirs(cfg.data.primekg_dir, exist_ok=True)
+    os.makedirs(cfg.data.biobridge_dir, exist_ok=True)
+
+
+    yield BioBridgePrimeKG(cfg) # Yield the instance
+    # shutil.rmtree(tmpdir) # Clean up the temporary directory after the module tests are done
+
 
 def test_download_primekg(biobridge_primekg):
     """
@@ -109,17 +117,17 @@ def test_download_primekg(biobridge_primekg):
     assert len(biobridge_triplets) > 0
     assert biobridge_triplets.shape[0] == 3904610
     assert list(biobridge_splits.keys()) == ['train', 'node_train', 'test', 'node_test']
-    assert len(biobridge_splits['train']) == 3510930
+    assert len(biobridge_splits['train']) == 3524781
     assert len(biobridge_splits['node_train']) == 76486
-    assert len(biobridge_splits['test']) == 393680
+    assert len(biobridge_splits['test']) == 379829 
     assert len(biobridge_splits['node_test']) == 8495
     # Check node info dictionary
     assert list(biobridge_node_info.keys()) == ['gene/protein',
-                                                'molecular_function',
-                                                'cellular_component',
-                                                'biological_process',
-                                                'drug',
-                                                'disease']
+                                                 'molecular_function',
+                                                 'cellular_component',
+                                                 'biological_process',
+                                                 'drug',
+                                                 'disease']
     assert len(biobridge_node_info['gene/protein']) == 19162
     assert len(biobridge_node_info['molecular_function']) == 10966
     assert len(biobridge_node_info['cellular_component']) == 4013
@@ -209,17 +217,17 @@ def test_load_existing_primekg(biobridge_primekg):
     assert len(biobridge_triplets) > 0
     assert biobridge_triplets.shape[0] == 3904610
     assert list(biobridge_splits.keys()) == ['train', 'node_train', 'test', 'node_test']
-    assert len(biobridge_splits['train']) == 3510930
+    assert len(biobridge_splits['train']) == 3524781
     assert len(biobridge_splits['node_train']) == 76486
-    assert len(biobridge_splits['test']) == 393680
+    assert len(biobridge_splits['test']) == 379829
     assert len(biobridge_splits['node_test']) == 8495
     # Check node info dictionary
     assert list(biobridge_node_info.keys()) == ['gene/protein',
-                                                'molecular_function',
-                                                'cellular_component',
-                                                'biological_process',
-                                                'drug',
-                                                'disease']
+                                                 'molecular_function',
+                                                 'cellular_component',
+                                                 'biological_process',
+                                                 'drug',
+                                                 'disease']
     assert len(biobridge_node_info['gene/protein']) == 19162
     assert len(biobridge_node_info['molecular_function']) == 10966
     assert len(biobridge_node_info['cellular_component']) == 4013

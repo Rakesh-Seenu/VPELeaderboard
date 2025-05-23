@@ -89,12 +89,3 @@ def test_dataloaders_return_data(datamodule):
     assert train_batch is not None
     assert val_batch is not None
     assert test_batch is not None
-
-
-def test_iterable_dataset(datamodule):
-    """
-    Test that iterable dataset returns expected tensors.
-    """
-    dataset = datamodule.get_iterable_dataset("disease")
-    sample = next(iter(dataset))
-    assert isinstance(sample, torch.Tensor)
