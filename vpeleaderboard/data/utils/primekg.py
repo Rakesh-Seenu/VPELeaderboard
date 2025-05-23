@@ -2,6 +2,7 @@
 Test cases for datasets/primekg_loader.py
 """
 
+from omegaconf import DictConfig
 import os
 import requests
 from tqdm import tqdm
@@ -14,7 +15,7 @@ class PrimeKG:
     The data is then loaded into pandas DataFrame of nodes and edges.
     """
 
-    def __init__(self, local_dir: str = "../../../../data/primekg/"):
+    def __init__(self, cfg: DictConfig) -> None:
         """
         Constructor for PrimeKG class.
 
@@ -24,7 +25,8 @@ class PrimeKG:
         self.name: str = "primekg"
         self.server_path: str = "https://dataverse.harvard.edu/api/access/datafile/"
         self.file_ids: dict = {"nodes": 6180617, "edges": 6180616}
-        self.local_dir: str = local_dir
+
+        self.local_dir: str = cfg.data.primekg_dir
 
         # Attributes to store the data
         self.nodes: pd.DataFrame = None

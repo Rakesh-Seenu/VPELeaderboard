@@ -1,7 +1,7 @@
 """
 Class for loading BioBridgePrimeKG dataset and  PrimeKG nodes and edges data set.
 """
-
+from omegaconf import DictConfig
 import os
 import pickle
 import json
@@ -20,11 +20,7 @@ class BioBridgePrimeKG:
     https://github.com/RyanWangZf/BioBridge
     """
 
-    def __init__(self,
-                 primekg_dir: str = "../../../../data/primekg/",
-                 local_dir: str = "../../../../data/biobridge_primekg/",
-                 random_seed: int=0,
-                 n_neg_samples: int=5):
+    def __init__(self, cfg: DictConfig):
         """
         Constructor for BioBridgePrimeKG class.
 
@@ -34,10 +30,10 @@ class BioBridgePrimeKG:
             random_seed (int): The random seed value.
         """
         self.name: str = "biobridge_primekg"
-        self.primekg_dir: str = primekg_dir
-        self.local_dir: str = local_dir
-        self.random_seed = random_seed
-        self.n_neg_samples = n_neg_samples
+        self.primekg_dir: str = cfg.data.primekg_dir
+        self.local_dir: str = cfg.data.biobridge_dir
+        self.random_seed: int = cfg.data.random_seed if "random_seed" in cfg.data else 0
+        self.n_neg_samples: int = cfg.data.n_neg_samples if "n_neg_samples" in cfg.data else 5
         # Preselected node types:
         # protein, molecular function, cellular component, biological process, drug, disease
         self.preselected_node_types = ["protein", "mf", "cc", "bp", "drug", "disease"]
