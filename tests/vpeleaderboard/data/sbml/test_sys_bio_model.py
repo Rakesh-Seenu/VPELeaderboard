@@ -14,7 +14,7 @@ from tests.vpeleaderboard.data.utils.utils import (
 
 MODEL_PATH = "vpeleaderboard/data/src/sbml/models/BIOMD0000000064_url.xml"
 
-class TestSysBioModel(SysBioModel):
+class _ConcreteSysBioModelForTesting(SysBioModel):
     """Concrete subclass to test abstract SysBioModel"""
     def get_model_metadata(self):
         """Dummy method implementation for testing"""
