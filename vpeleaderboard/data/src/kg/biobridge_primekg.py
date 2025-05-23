@@ -1,10 +1,11 @@
 """
 Class for loading BioBridgePrimeKG dataset and  PrimeKG nodes and edges data set.
 """
-from omegaconf import DictConfig
+
 import os
 import pickle
 import json
+from omegaconf import DictConfig
 import requests
 import numpy as np
 import pandas as pd
@@ -30,6 +31,7 @@ class BioBridgePrimeKG:
             random_seed (int): The random seed value.
         """
         self.name: str = "biobridge_primekg"
+        # self.cfg = cfg
         self.primekg_dir: str = cfg.data.primekg_dir
         self.local_dir: str = cfg.data.biobridge_dir
         self.random_seed: int = cfg.data.random_seed if "random_seed" in cfg.data else 0
@@ -82,7 +84,7 @@ class BioBridgePrimeKG:
         Returns:
             The PrimeKG dataset.
         """
-        primekg_data = PrimeKG(local_dir=self.primekg_dir)
+        primekg_data = PrimeKG(self.primekg_dir)
         primekg_data.load_data()
 
         return primekg_data

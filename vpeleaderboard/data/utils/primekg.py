@@ -2,8 +2,8 @@
 Test cases for datasets/primekg_loader.py
 """
 
-from omegaconf import DictConfig
 import os
+from omegaconf import DictConfig
 import requests
 from tqdm import tqdm
 import pandas as pd

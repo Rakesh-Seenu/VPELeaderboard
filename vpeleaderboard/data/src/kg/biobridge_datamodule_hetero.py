@@ -51,6 +51,7 @@ class BioBridgeDataModule(LightningDataModule):
     def __init__(self, cfg: DictConfig) -> None:
         super().__init__()
         self.save_hyperparameters(logger=False)
+        self.cfg = cfg
         self.primekg_dir = cfg.data.primekg_dir
         self.biobridge_dir = cfg.data.biobridge_dir
         self.batch_size = cfg.data.batch_size
@@ -60,8 +61,7 @@ class BioBridgeDataModule(LightningDataModule):
         self.data = {}
 
     def _load_biobridge_data(self) -> None:
-        self.biobridge = BioBridgePrimeKG(local_dir=self.biobridge_dir,
-                                         primekg_dir=self.primekg_dir)
+        self.biobridge = BioBridgePrimeKG(self.cfg)
         self.biobridge.load_data()
 
         self.data['nt2ntid'] = self.biobridge.get_data_config()["node_type"]
