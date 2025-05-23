@@ -28,8 +28,12 @@ class PrimeKG:
 
         if isinstance(cfg, DictConfig):
             self.local_dir: str = cfg.data.primekg_dir
-        else:
+        elif isinstance(cfg, dict):
             self.local_dir: str = cfg["data"]["primekg_dir"]
+        elif isinstance(cfg, str):
+            self.local_dir: str = cfg
+        else:
+            raise TypeError(f"Unsupported config type: {type(cfg)}")
 
 
         # Attributes to store the data
