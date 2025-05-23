@@ -43,9 +43,9 @@ def datamodule(biobridge_config):
     """
     cache_path = biobridge_config.data.cache_path
 
-    # Ensure no previous cache
-    if os.path.exists(cache_path):
-        os.remove(cache_path)
+    # # Ensure no previous cache
+    # if os.path.exists(cache_path):
+    #     os.remove(cache_path)
 
     module = BioBridgeDataModule(biobridge_config)
     module.prepare_data()
