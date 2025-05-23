@@ -26,7 +26,7 @@ Choose the workflow relevant to your data:
 
     Import and standardize structured graph datasets such as biomedical or molecular knowledge graphs. Includes preprocessing, normalization, and integration into our evaluation pipelines.
 
-    [📄 Code Documentation](kg_dataloader.md){ .md-button .md-button}     [📘 Tutorial Notebook](../notebooks/kg_dataloader.ipynb){ .md-button .md-button}
+    [📄 Code Documentation](kg_dataloader.md){ .md-button .md-button}     [📘 Tutorial Notebook](../notebooks/KG_dataloader.ipynb){ .md-button .md-button}
 
 </div>
 

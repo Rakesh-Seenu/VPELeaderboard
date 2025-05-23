@@ -20,7 +20,6 @@ nav:
     - KG Dataloader:
       - Biobridge Dataloader: data/kg_dataloader.md
       - Biobridge Primekg: data/biobridge_primekg.md
-      - Dataset: data/dataset.md
       - Primekg: data/primekg.md
 - Algorithms: algorithms/index.md
 - Leaderboard: leaderboard/index.md

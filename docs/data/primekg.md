@@ -1,1 +1,1 @@
-::: vpeleaderboard.data.src.kg.primekg
+::: vpeleaderboard.data.utils.primekg

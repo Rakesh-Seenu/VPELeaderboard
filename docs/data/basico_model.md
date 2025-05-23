@@ -1,2 +1,2 @@
 
-::: vpeleaderboard.data.src.basico_model
+::: vpeleaderboard.data.src.sbml.basico_model

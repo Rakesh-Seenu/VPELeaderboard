@@ -1,1 +1,1 @@
-::: vpeleaderboard.data.src.sys_bio_model
+::: vpeleaderboard.data.src.sbml.sys_bio_model
