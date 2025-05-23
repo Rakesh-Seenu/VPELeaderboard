@@ -3,36 +3,42 @@ import shutil
 import pickle
 import pytest
 import torch
+import tempfile
 import torch_geometric
 from omegaconf import OmegaConf
 from vpeleaderboard.data.src.kg.biobridge_datamodule_hetero import BioBridgeDataModule
 
 # Constants for test environment
-PRIMEKG_LOCAL_DIR = "../../../../data/primekg_test/"
-BIOBRIDGE_LOCAL_DIR = "../../../../data/biobridge_primekg_test/"
-CACHE_PATH = "../../../../data/test_cache.pkl"
+PRIMEKG_LOCAL_DIR = "tests/tmp/primekg_test/"
+BIOBRIDGE_LOCAL_DIR = "tests/tmp/biobridge_primekg_test/"
+CACHE_PATH = "tests/tmp/test_cache.pkl"
+
+
+import tempfile
 
 @pytest.fixture(scope="module")
 def biobridge_config():
     """
     Create a fake Hydra config for BioBridgeDataModule.
     """
-    return OmegaConf.create({
-        "data": {
-            "primekg_dir": PRIMEKG_LOCAL_DIR,
-            "biobridge_dir": BIOBRIDGE_LOCAL_DIR,
-            "batch_size": 1,
-            "cache_path": CACHE_PATH
-        },
-        "random_link_split": {
-            "num_val": 0.1,
-            "num_test": 0.1,
-            "is_undirected": True,
-            "add_negative_train_samples": False,
-            "neg_sampling_ratio": 1.0,
-            "split_labels": False
-        }
-    })
+    with tempfile.TemporaryDirectory() as tmpdir:
+        return OmegaConf.create({
+            "data": {
+                "primekg_dir": os.path.join(tmpdir, "primekg_test"),
+                "biobridge_dir": os.path.join(tmpdir, "biobridge_primekg_test"),
+                "batch_size": 1,
+                "cache_path": os.path.join(tmpdir, "test_cache.pkl")
+            },
+            "random_link_split": {
+                "num_val": 0.1,
+                "num_test": 0.1,
+                "is_undirected": True,
+                "add_negative_train_samples": False,
+                "neg_sampling_ratio": 1.0,
+                "split_labels": False
+            }
+        })
+
 
 @pytest.fixture(scope="module")
 def datamodule(biobridge_config):
