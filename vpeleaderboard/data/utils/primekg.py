@@ -66,6 +66,7 @@ class PrimeKG:
             unit="iB",
             unit_scale=True,
         )
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
         with open(local_path, "wb") as file:
             for data in response.iter_content(1024):
                 progress_bar.update(len(data))

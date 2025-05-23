@@ -18,8 +18,8 @@ def biobridge_config():
 
     config = OmegaConf.create({
         "data": {
-            "primekg_dir": os.path.join(tmpdir, "primekg_test"),
-            "biobridge_dir": os.path.join(tmpdir, "biobridge_primekg_test"),
+            "primekg_dir": os.path.join(tmpdir, "primekg"),
+            "biobridge_dir": os.path.join(tmpdir, "biobridge_primekg"),
             "batch_size": 1,
             "cache_path": os.path.join(tmpdir, "test_cache.pkl")
         },

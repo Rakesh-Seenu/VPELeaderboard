@@ -16,7 +16,7 @@ def primekg_fixture():
     """
     Fixture for creating an instance of PrimeKG.
     """
-    return PrimeKG(local_dir=LOCAL_DIR)
+    return PrimeKG(LOCAL_DIR)
 
 def test_download_primekg(primekg):
     """

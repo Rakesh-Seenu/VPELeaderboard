@@ -5,11 +5,12 @@ Test cases for datasets/primekg_loader.py
 import os
 import shutil
 import pytest
+from omegaconf import DictConfig
 from vpeleaderboard.data.src.kg.biobridge_primekg import BioBridgePrimeKG
 
 # Remove the data folder for testing if it exists
-PRIMEKG_LOCAL_DIR = "../../../../data/primekg_test/"
-LOCAL_DIR = "../../../../data/biobridge_primekg_test/"
+PRIMEKG_LOCAL_DIR = "../../../../data/primekg/"
+LOCAL_DIR = "../../../../data/biobridge_primekg/"
 shutil.rmtree(LOCAL_DIR, ignore_errors=True)
 
 @pytest.fixture(name="biobridge_primekg")
@@ -17,8 +18,15 @@ def biobridge_primekg_fixture():
     """
     Fixture for creating an instance of PrimeKG.
     """
-    return BioBridgePrimeKG(primekg_dir=PRIMEKG_LOCAL_DIR,
-                            local_dir=LOCAL_DIR)
+    cfg = DictConfig({
+    "data": {
+        "primekg_dir": "../../../data/primekg/",
+        "biobridge_dir": "../../../data/biobridge_primekg/",
+        "random_seed": 42, # Optional, if your tests rely on it
+        "n_neg_samples": 5 # Optional
+    }
+    })
+    return BioBridgePrimeKG(cfg)
 
 def test_download_primekg(biobridge_primekg):
     """
