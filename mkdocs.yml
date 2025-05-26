@@ -4,7 +4,7 @@ repo_name: VPE/Leaderboard
 nav:
 - Home: index.md
 - Getting started: user-guide/index.md
-- Data: 
+- Data:
   - Data Overview: data/overview.md
   - SBML Data: data/index.md
   - KG Data: data/index_kg.md

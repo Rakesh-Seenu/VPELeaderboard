@@ -35,6 +35,7 @@ jobs:
           python -m app.algorithms.table  
           python -m app.data.markdown_report
           python -m app.leaderboard.table
+          python -m app.data.kg_report
       # Cache dependencies for later steps    
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
       - uses: actions/cache@v3
