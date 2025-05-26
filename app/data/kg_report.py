@@ -42,11 +42,9 @@ def get_kg_stats(config: DictConfig) -> tuple[int, int]:
 
         logger.info("KG Stats — Nodes: %d, Edges: %d", num_nodes, num_edges)
         return num_nodes, num_edges
-    except Exception as e:
+    except ValueError as e:
         logger.error("Error while computing KG stats: %s", str(e))
-        return 0, 0    
-
-
+        return 0, 0
 def generate_kg_markdown_report(
     num_nodes: int,
     num_edges: int,
@@ -69,7 +67,6 @@ def generate_kg_markdown_report(
     template_file = path_info.get("template_file")
     output_file = path_info.get("output_file")
 
-    # Add model metadata with KG stats (global values for each model)
     if models:
         for model in models:
             table_data.append({
@@ -80,8 +77,6 @@ def generate_kg_markdown_report(
             })
     else:
         logger.info("No model metadata provided; only KG stats will be included.")
-
-    # Convert to DataFrame and then to dict format for templating
     metadata_df = pd.DataFrame(table_data)
     metadata_records = metadata_df.to_dict(orient='records')
     markdown_content = create_markdown(metadata_records, template_dir, template_file)
