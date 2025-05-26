@@ -6,8 +6,8 @@ nav:
 - Getting started: user-guide/index.md
 - Data: 
   - Data Overview: data/overview.md
-  - SBML Dataloader: data/index.md
-  - KG Dataloader: data/index_kg.md
+  - SBML Data: data/index.md
+  - KG Data: data/index_kg.md
   - Model Submission Guide: data/loading_model.md
   - Tutorials: 
     - SBML Dataloader: notebooks/sbml_dataloader.ipynb

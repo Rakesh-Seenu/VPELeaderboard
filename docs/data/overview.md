@@ -5,7 +5,7 @@ hide:
 
 # 🧬 Data Overview
 
-Welcome to the **Data Section** of the [VPE Leaderboard](https://github.com/VirtualPatientEngine) platform. This section provides the tools, documentation, and loaders needed to work with two primary data formats: **SBML models** and **Knowledge Graphs (KGs)**.
+Welcome to the **Data Section** of the [VPE Leaderboard](https://github.com/VirtualPatientEngine) platform. This section provides the tools, documentation, and loaders needed to work with two primary data formats: **[SBML models](index.md)** and **[Knowledge Graphs (KGs)](index_kg.md)**.
 
 Choose the workflow relevant to your data:
 

@@ -1,5 +1,19 @@
 paths:
-  input_folder: "vpeleaderboard/data/models"
+  input_folder: "vpeleaderboard/data/src/sbml/models"
   template_dir: "app/templates"
   template_file: "data.html"
   output_file: "docs/data/index.md"
+
+#kg data information
+
+models:
+  - name: BioBridge
+    abstract: BioBridge is the official implementation of the paper " Bridging Biomedical Foundation Models via Knowledge Graphs (ICLR 2024)". It leverages knowledge graphs to connect independently trained biomedical foundation models, enabling multimodal learning without fine-tuning. The repository includes trained model checkpoints, raw and processed data, embeddings from unimodal models like PubMedBERT and UniMol, and example scripts for training and evaluation. BioBridge supports applications such as cross-modality prediction, protein prediction, and molecule generation.
+
+kg_paths:
+  template_dir: "app/templates"
+  template_file: "kg.html"
+  output_file: "docs/data/index_kg.md"
+  
+primekg_dir: "../../data/primekg/"
+biobridge_dir: "../../data/biobridge_primekg/"
