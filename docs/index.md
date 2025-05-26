@@ -24,7 +24,7 @@ Welcome to [**Team VPE's**](https://github.com/VirtualPatientEngine) **Leaderboa
 
     Discover datasets integrated seamlessly into the framework for streamlined analysis and experimentation.
 
-    [Explore Data](data){ .md-button .md-button }
+    [Explore Data](data/overview.md){ .md-button .md-button }
 
 -   :material-code-greater-than:{ .lg } __Algorithms__
 
