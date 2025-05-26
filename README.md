@@ -7,13 +7,15 @@
 
 ## Introduction
 
-Welcome to **VPELeaderboard**, an open-source project developed by **Team VPE**. The primary objective of this project is to evaluate and benchmark the performance of advanced time series forecasting models when applied to simulated biological data. Unlike traditional methods that rely on handcrafted mathematical models, we focus on directly forecasting simulation results through AI-driven techniques. This leaderboard provides a comprehensive analysis of the strengths and limitations of these models, offering valuable insights into their effectiveness in predicting the dynamics of complex biological systems.
+Welcome to **VPELeaderboard**, an open-source project developed by **Team VPE**. The primary objective of this project is to evaluate and benchmark the performance of advanced time series forecasting models when applied to simulated biological data. Unlike traditional methods that rely on handcrafted mathematical models, we focus on directly forecasting simulation results through AI-driven techniques. This leaderboard provides a comprehensive analysis of the strengths and limitations of these models, offering valuable insights into their effectiveness in predicting the dynamics of complex biological systems.In addition to SBML-based simulations, the platform now supports **Knowledge Graphs (KGs)** as part of the dataset library. KGs are powerful tools for representing biological entities and their relationships, enabling advanced machine learning tasks such as link prediction and time-series inference on structured biomedical knowledge. The first supported KG is **BioBridge**, a curated subset of PrimeKG enriched with multi-modal node features. Future updates will extend support to **PrimeKG** and other biomedical graphs.
 
 We invite you to explore the repository and gain a clear understanding of the models being tested and their performance metrics.
 
 Our toolkit currently consists of the following components:
 
-- **Data:** Explore integrated datasets, including ordinary differential equation models in SBML format.
+- **Data:** Explore integrated datasets, including:
+  - **SBML models** (systems biology models in standard XML format for simulating biological processes)
+  - **Knowledge Graphs (KGs)**, starting with **BioBridge**, a biomedical graph containing rich node features and relationships. Support for **PrimeKG** will be added in a future update.
 - **Algorithms:** A collection of cutting-edge algorithms that have been developed to tackle time series forecasting and predictive modeling tasks.
 - **Leaderboard:** An interactive leaderboard that evaluates and compares the performance of time series forecasting models, focusing on how well they predict the trajectories of simulated biological processes.
 
