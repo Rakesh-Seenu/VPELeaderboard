@@ -35,19 +35,9 @@ class PrimeKG:
         else:
             raise TypeError(f"Unsupported config type: {type(cfg)}")
 
-
         # Attributes to store the data
         self.nodes: pd.DataFrame = None
         self.edges: pd.DataFrame = None
-
-        # Set up the dataset
-        self.setup()
-
-    def setup(self):
-        """
-        A method to set up the dataset.
-        """
-        # Make the directory if it doesn't exist
         os.makedirs(os.path.dirname(self.local_dir), exist_ok=True)
 
 
@@ -86,26 +76,16 @@ class PrimeKG:
         local_file = os.path.join(self.local_dir, f"{self.name}_nodes.tsv.gz")
         if os.path.exists(local_file):
             print(f"{local_file} already exists. Loading the data from the local directory.")
-
-            # Load the dataframe from the local directory and assign it to the nodes attribute
             nodes = pd.read_csv(local_file, sep="\t", compression="gzip", low_memory=False)
         else:
             print(f"Downloading node file from {self.server_path}{self.file_ids['nodes']}")
-
-            # Download the file from the Harvard Dataverse with designated file_id for node
             self._download_file(f"{self.server_path}{self.file_ids['nodes']}",
                                 os.path.join(self.local_dir, "nodes.tab"))
-
-            # Load the downloaded file into a pandas DataFrame
             nodes = pd.read_csv(os.path.join(self.local_dir, "nodes.tab"),
                                      sep="\t", low_memory=False)
-
-            # Further processing of the dataframe
             nodes = nodes[
                 ["node_index", "node_name", "node_source", "node_id", "node_type"]
             ]
-
-            # Store compressed dataframe in the local directory
             nodes.to_csv(local_file, index=False, sep="\t", compression="gzip")
 
         return nodes
@@ -126,21 +106,13 @@ class PrimeKG:
         local_file = os.path.join(self.local_dir, f"{self.name}_edges.tsv.gz")
         if os.path.exists(local_file):
             print(f"{local_file} already exists. Loading the data from the local directory.")
-
-            # Load the dataframe from the local directory and assign it to the edges attribute
             edges = pd.read_csv(local_file, sep="\t", compression="gzip", low_memory=False)
         else:
             print(f"Downloading edge file from {self.server_path}{self.file_ids['edges']}")
-
-            # Download the file from the Harvard Dataverse with designated file_id for edge
             self._download_file(f"{self.server_path}{self.file_ids['edges']}",
                                 os.path.join(self.local_dir, "edges.csv"))
-
-            # Load the downloaded file into a pandas DataFrame
             edges = pd.read_csv(os.path.join(self.local_dir, "edges.csv"),
                                      sep=",", low_memory=False)
-
-            # Further processing of the dataframe
             edges = edges.merge(
                 nodes, left_on="x_index", right_on="node_index"
             )
@@ -176,8 +148,6 @@ class PrimeKG:
                     "display_relation", "relation",
                 ]
             ]
-
-            # Store compressed dataframe in the local directory
             edges.to_csv(local_file, index=False, sep="\t", compression="gzip")
 
         return edges
@@ -186,10 +156,7 @@ class PrimeKG:
         """
         Load the PrimeKG dataset into pandas DataFrame of nodes and edges.
         """
-        print("Loading nodes of PrimeKG dataset ...")
         self.nodes = self._load_nodes()
-
-        print("Loading edges of PrimeKG dataset ...")
         self.edges = self._load_edges(self.nodes)
 
     def get_nodes(self) -> pd.DataFrame:
