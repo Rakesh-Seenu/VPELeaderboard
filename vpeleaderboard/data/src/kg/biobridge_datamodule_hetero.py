@@ -225,15 +225,6 @@ class BioBridgeDataModule(LightningDataModule):
         return GeoDataLoader([self.data["test"]], batch_size=1, shuffle=False)
 
     def teardown(self, stage: Optional[str] = None) -> None:
-        """
-        Optional cleanup after training/testing.
-
-        Args:
-            stage (Optional[str]): Current stage of execution.
-
-        Returns:
-            None
-        """
         pass
 
     def state_dict(self) -> Dict[Any, Any]:
@@ -246,13 +237,4 @@ class BioBridgeDataModule(LightningDataModule):
         return {}
 
     def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
-        """
-        Loads the internal state of the data module.
-
-        Args:
-            state_dict (dict): State dictionary.
-
-        Returns:
-            None
-        """
         pass
