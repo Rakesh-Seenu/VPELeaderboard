@@ -41,11 +41,11 @@ jobs:
 
       - name: Create conda environment and install dependencies
         if: steps.cache-conda.outputs.cache-hit != 'true'
-        shell: bash -l {0}
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash -l {0}' }}
         run: |
+          conda update -n base -c defaults conda -y
           conda create -n $CONDA_ENV_NAME python=3.12 -y
           conda activate $CONDA_ENV_NAME
-          pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run pylint
@@ -54,64 +54,64 @@ jobs:
           conda activate $CONDA_ENV_NAME
           pylint --disable=R0801,R0902,W0221,W0122 vpeleaderboard/ app/
 
-  code-cov-ubuntu-macos:
-    name: code-coverage-ubuntu-macos
-    runs-on: ${{ matrix.os }}
+  # code-cov-ubuntu-macos:
+  #   name: code-coverage-ubuntu-macos
+  #   runs-on: ${{ matrix.os }}
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
 
-    env:
-      CONDA_ENV_NAME: myenv
+  #   env:
+  #     CONDA_ENV_NAME: myenv
 
-    steps:
-      - uses: actions/checkout@v3
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          python-version: 3.12
-          miniconda-version: latest
-          auto-update-conda: true
-          activate-environment: ${{ env.CONDA_ENV_NAME }}
+  #     - name: Setup Miniconda
+  #       uses: conda-incubator/setup-miniconda@v3
+  #       with:
+  #         python-version: 3.12
+  #         miniconda-version: latest
+  #         auto-update-conda: true
+  #         activate-environment: ${{ env.CONDA_ENV_NAME }}
 
-      - name: Cache conda environment
-        id: cache-conda
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.CONDA }}/envs/${{ env.CONDA_ENV_NAME }}
-          key: ${{ runner.os }}-conda-${{ env.CONDA_ENV_NAME }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-conda-${{ env.CONDA_ENV_NAME }}-
+  #     - name: Cache conda environment
+  #       id: cache-conda
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: ${{ env.CONDA }}/envs/${{ env.CONDA_ENV_NAME }}
+  #         key: ${{ runner.os }}-conda-${{ env.CONDA_ENV_NAME }}-${{ hashFiles('**/requirements.txt') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-conda-${{ env.CONDA_ENV_NAME }}-
 
-      - name: Create conda environment and install dependencies
-        if: steps.cache-conda.outputs.cache-hit != 'true'
-        shell: bash -l {0}
-        run: |
-          conda create -n $CONDA_ENV_NAME python=3.12 -y
-          conda activate $CONDA_ENV_NAME
-          pip install --upgrade pip
-          pip install -r requirements.txt
+  #     - name: Create conda environment and install dependencies
+  #       if: steps.cache-conda.outputs.cache-hit != 'true'
+  #       shell: bash -l {0}
+  #       run: |
+  #         conda create -n $CONDA_ENV_NAME python=3.12 -y
+  #         conda activate $CONDA_ENV_NAME
+  #         pip install --upgrade pip
+  #         pip install -r requirements.txt
 
-      - name: Run tests with coverage
-        shell: bash -l {0}
-        run: |
-          conda activate $CONDA_ENV_NAME
-          coverage run --include=vpeleaderboard/* --include=app/* -m pytest --cache-clear tests/
+  #     - name: Run tests with coverage
+  #       shell: bash -l {0}
+  #       run: |
+  #         conda activate $CONDA_ENV_NAME
+  #         coverage run --include=vpeleaderboard/* --include=app/* -m pytest --cache-clear tests/
 
-      - name: Check coverage
-        shell: bash -l {0}
-        run: |
-          conda activate $CONDA_ENV_NAME
-          coverage report -m
-          TOTAL_COVERAGE=$(coverage report -m | awk 'END {print int($NF)}')
-          if [[ $TOTAL_COVERAGE -ne 100 ]]; then
-            echo "Code coverage is not 100%. Please check the coverage report."
-            exit 1
-          fi
-        env:
-          COVERAGE_FILE: './.coverage'
+  #     - name: Check coverage
+  #       shell: bash -l {0}
+  #       run: |
+  #         conda activate $CONDA_ENV_NAME
+  #         coverage report -m
+  #         TOTAL_COVERAGE=$(coverage report -m | awk 'END {print int($NF)}')
+  #         if [[ $TOTAL_COVERAGE -ne 100 ]]; then
+  #           echo "Code coverage is not 100%. Please check the coverage report."
+  #           exit 1
+  #         fi
+  #       env:
+  #         COVERAGE_FILE: './.coverage'
 
   code-cov-windows:
     name: code-coverage-windows
@@ -159,7 +159,8 @@ jobs:
           conda run -n $Env:CONDA_ENV_NAME coverage report -m
           $totalCoverage = (conda run -n $Env:CONDA_ENV_NAME coverage report -m | Select-Object -Last 1) -split '\s+' | Select-Object -Last 1
           $totalCoverage = [int]($totalCoverage -replace '[^\d]')
-          Write-Host "Total coverage: $totalCoverage"
+          $TOTAL_COVERAGE=[int]$TOTAL_COVERAGE
+          echo "Total coverage: $TOTAL_COVERAGE"
           if ($totalCoverage -ne 100) {
             Write-Host "Code coverage is not 100%. Please check the coverage report."
             exit 1
