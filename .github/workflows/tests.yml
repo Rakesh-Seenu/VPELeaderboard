@@ -115,7 +115,13 @@ jobs:
 
   code-cov-windows:
     name: code-coverage-windows
-    runs-on: windows-latest
+    # runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+
     env:
       CONDA_ENV_NAME: myenv
 
@@ -151,20 +157,12 @@ jobs:
       - name: Run tests with coverage
         shell: pwsh
         run: |
-          conda run -n $Env:CONDA_ENV_NAME coverage run --include=vpeleaderboard/* --include=app/* -m pytest --cache-clear tests/
+          conda run -n $Env:CONDA_ENV_NAME 
+          coverage run --include=vpeleaderboard/* --include=app/* -m pytest --cache-clear tests/
 
       - name: Check coverage
         shell: pwsh
         run: |
-          $coverageOutput = conda run -n $Env:CONDA_ENV_NAME coverage report -m
-          $coverageOutput | Write-Host
-          $lastLine = $coverageOutput | Select-Object -Last 1
-          $percentageString = ($lastLine -split '\s+')[-1]
-          $TOTAL_COVERAGE = [int]($percentageString -replace '[^\d]')
-          echo "Total coverage: $TOTAL_COVERAGE%" # Added '%' for clarity in output
-          if ($TOTAL_COVERAGE -ne 100) {
-            Write-Host "Code coverage is not 100%. Please check the coverage report."
-            exit 1
-          }
+          conda run -n $Env:CONDA_ENV_NAME coverage report -m --fail-under=100
         env:
           COVERAGE_FILE: './.coverage'
