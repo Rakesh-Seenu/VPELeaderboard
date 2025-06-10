@@ -41,7 +41,7 @@ jobs:
 
       - name: Create conda environment and install dependencies
         if: steps.cache-conda.outputs.cache-hit != 'true'
-        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash -l {0}' }}
+        shell: bash -l {0}
         run: |
           conda update -n base -c defaults conda -y
           conda create -n $CONDA_ENV_NAME python=3.12 -y
